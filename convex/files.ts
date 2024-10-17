@@ -1,7 +1,6 @@
 import { mutation, QueryCtx, MutationCtx, query } from './_generated/server'
 import { ConvexError, v } from 'convex/values'
 import { getUser } from './users'
-import { throws } from 'assert'
 
 async function hasAccessToOrg(ctx: QueryCtx | MutationCtx, tokenIdentifier: string, orgId: string) {
   const user = await getUser(ctx, tokenIdentifier)
@@ -12,10 +11,23 @@ async function hasAccessToOrg(ctx: QueryCtx | MutationCtx, tokenIdentifier: stri
   return hasAccess
 }
 
+export const generateUploadUrl = mutation(async (ctx) => {
+  const identity = await ctx.auth.getUserIdentity()
+
+  console.log('id', identity)
+  if (!identity) {
+    console.log('you must be logged in')
+    return
+  }
+
+  return await ctx.storage.generateUploadUrl();
+})
+
 export const createFile = mutation({
   args: {
     name: v.string(),
-    orgId: v.string()
+    orgId: v.string(),
+    fileId: v.id("_storage")
   },
   async handler(ctx, args) {
     const identity = await ctx.auth.getUserIdentity()
@@ -26,7 +38,7 @@ export const createFile = mutation({
       return
     }
 
-
+    // throw new Error('no access')
     const user = await getUser(ctx, identity.tokenIdentifier)
     const hasAccess = await hasAccessToOrg(ctx, identity.tokenIdentifier, args.orgId)
     if (!hasAccess) {
@@ -34,7 +46,8 @@ export const createFile = mutation({
     }
     await ctx.db.insert('files', {
       name: args.name,
-      orgId: args.orgId
+      orgId: args.orgId,
+      fileId: args.fileId
     })
   }
 })
