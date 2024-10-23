@@ -52,6 +52,31 @@ export const createFile = mutation({
   }
 })
 
+export const deleteFile = mutation({
+  args: { fileId: v.id("files") }
+  , handler: async (ctx, args) => {
+    console.log('deleteFile')
+    const identity = await ctx.auth.getUserIdentity()
+    console.log('identity', identity)
+    if (!identity) {
+      console.log('you must be logged in')
+      return []
+    }
+    const file = await ctx.db.get(args.fileId)
+
+    if (!file) {
+      throw new ConvexError('File does not exist')
+    }
+    const hasAccess = await hasAccessToOrg(ctx, identity.tokenIdentifier, file.orgId)
+    if (!hasAccess) {
+      throw new ConvexError('You do not have access to delete this file.')
+    }
+    await ctx.db.delete(args.fileId)
+    return
+  }
+
+})
+
 export const getFiles = query({
   args: { orgId: v.string() },
   handler: async (ctx, args) => {
