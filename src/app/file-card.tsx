@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreVertical, TrashIcon } from "lucide-react"
+import { GanttChartIcon, ImageIcon, MoreVertical, TextIcon, TrashIcon } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,12 +20,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import { useMutation } from "convex/react"
+import { useToast } from "@/hooks/use-toast"
 
 
 export function FileCardActions({ file }: { file: Doc<"files"> }) {
   const deleteFile = useMutation(api.files.deleteFile)
+  const { toast } = useToast()
   const [isOpen, setOpen] = useState(false)
   return (
     <>
@@ -39,7 +41,7 @@ export function FileCardActions({ file }: { file: Doc<"files"> }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteFile({ fileId: file._id })}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={async () => { await deleteFile({ fileId: file._id }); toast({ variant: "default", title: "File deleted", description: "Your file is now gone from the system. " }) }}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -54,17 +56,47 @@ export function FileCardActions({ file }: { file: Doc<"files"> }) {
   )
 }
 
+function getFileUrl = (file: Doc<"files">) => {
+  return ""
+}
+
 export function FileCard({ file }: { file: Doc<"files"> }) {
+  const isImage = (file: Doc<"files">) => {
+    switch (file.type) {
+      case "image/webp":
+      case "image/png":
+      case "image/jpeg":
+      case "image/jpg":
+        return true
+      default:
+        return false
+    }
+  }
+
+  const typeIcons = {
+    "image/webp": <ImageIcon />,
+    "image/png": <ImageIcon />,
+    "image/jpg": <ImageIcon />,
+    "image/jpeg": <ImageIcon />,
+    "application/pdf": <TextIcon />,
+    "text/csv": <GanttChartIcon />
+  } as Record<File['type'], ReactNode>
   return (
     <Card>
       <CardHeader className="relative">
-        <CardTitle>{file.name}</CardTitle>
+        <CardTitle className="flex gap-2">{typeIcons[file.type]} {file.name}</CardTitle>
         <div className="absolute top-4 right-2">
           <FileCardActions file={file} />
         </div>
       </CardHeader>
       <CardContent>
-        <p>Card Content</p>
+        {isImage(file) && (
+          <Image
+            alt="preview"
+            width="200"
+            height="100"
+            src={getFileUrl(file)} />
+        )}
       </CardContent>
       <CardFooter>
         <Button>Download</Button>

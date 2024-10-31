@@ -55,6 +55,8 @@ export default function UploadButton() {
     // ✅ This will be type-safe and validated.
     console.log(values)
     const selectedImage = values.file[0]
+    console.log('type', selectedImage.type)
+    const selectedType = selectedImage.type
     if (!orgId) return
 
     const postUrl = await generateUploadUrl()
@@ -73,8 +75,7 @@ export default function UploadButton() {
     // await sendImage({ storageId, author: user.user?.username });
     //
     try {
-
-      await createFile({ name: values.title, orgId, fileId: storageId })
+      await createFile({ name: values.title, type: selectedType, orgId, fileId: storageId })
       form.reset()
       setIsDialogOpen(false)
       toast({ title: 'File Uploaded', description: 'Now every one can see your file.', variant: 'success' })
