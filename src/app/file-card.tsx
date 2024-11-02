@@ -2,6 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Doc } from "../../convex/_generated/dataModel"
 import { Button } from "@/components/ui/button"
 import { api } from '../../convex/_generated/api'
+import Image from 'next/image'
 
 import {
   DropdownMenu,
@@ -56,11 +57,8 @@ export function FileCardActions({ file }: { file: Doc<"files"> }) {
   )
 }
 
-function getFileUrl = (file: Doc<"files">) => {
-  return ""
-}
 
-export function FileCard({ file }: { file: Doc<"files"> }) {
+export function FileCard({ file }: { file: Doc<"files"> & { url: string } }) {
   const isImage = (file: Doc<"files">) => {
     switch (file.type) {
       case "image/webp":
@@ -89,17 +87,19 @@ export function FileCard({ file }: { file: Doc<"files"> }) {
           <FileCardActions file={file} />
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="h-[200px] flex justify-center items-center">
         {isImage(file) && (
           <Image
             alt="preview"
             width="200"
             height="100"
-            src={getFileUrl(file)} />
+            src={file.url} />
         )}
+        {file.type == 'text/csv' && <GanttChartIcon className="w-20 h-20" />}
+        {file.type == 'application/pdf' && <TextIcon className="w-20 h-20" />}
       </CardContent>
-      <CardFooter>
-        <Button>Download</Button>
+      <CardFooter className="flex justify-center items-center">
+        <Button onClick={() => window.open(file.url, '_blank')}>Download</Button>
       </CardFooter>
     </Card>
 
