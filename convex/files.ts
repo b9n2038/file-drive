@@ -83,7 +83,7 @@ export const deleteFile = mutation({
 })
 
 export const getFiles = query({
-  args: { orgId: v.string() },
+  args: { orgId: v.string(), query: v.optional(v.string()) },
   handler: async (ctx, args) => {
 
     const identity = await ctx.auth.getUserIdentity()
@@ -103,8 +103,12 @@ export const getFiles = query({
       .withIndex('by_orgId', (q) => q.eq('orgId', args.orgId))
       .collect()
 
+    const query = args.query
+    console.log('query', query)
+    const filtered = !query || query.length === 0 ? files : files.filter((f) => f.name.includes(query))
+    console.log('filtered', filtered.length)
     const filesWithUrl = await Promise.all(
-      files.map(async (file) => ({
+      filtered.map(async (file) => ({
         ...file,
         url: await ctx.storage.getUrl(file.fileId),
       }))
