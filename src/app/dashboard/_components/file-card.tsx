@@ -1,5 +1,5 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Doc } from "../../../../convex/_generated/dataModel"
+import { Doc, Id } from "../../../../convex/_generated/dataModel"
 import { Button } from "@/components/ui/button"
 import { api } from '../../../../convex/_generated/api'
 import Image from 'next/image'
@@ -25,9 +25,10 @@ import { ReactNode, useState } from "react"
 import { useMutation } from "convex/react"
 import { useToast } from "@/hooks/use-toast"
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu"
+import { StarFilledIcon } from "@radix-ui/react-icons"
 
 
-export function FileCardActions({ file }: { file: Doc<"files"> }) {
+export function FileCardActions({ file, isFavourited }: { file: Doc<"files">, isFavourited: boolean }) {
   const deleteFile = useMutation(api.files.deleteFile)
   const toggleFavourite = useMutation(api.files.toggleFavourite)
 
@@ -53,7 +54,9 @@ export function FileCardActions({ file }: { file: Doc<"files"> }) {
       <DropdownMenu>
         <DropdownMenuTrigger><MoreVertical className="size-4" /></DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => toggleFavourite({ fileId: file._id })} className="flex gap-1  items-center cursor:pointer"><StarIcon className="w-4 h-4" />Favourite</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => toggleFavourite({ fileId: file._id })} className="flex gap-1  items-center cursor:pointer">
+            {isFavourited ? <StarFilledIcon className="w-4 h-4" /> :
+              <StarIcon className="w-4 h-4" />} Favourite</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setOpen(true)} className="flex gap-1 text-red-600 items-center cursor:pointer"><TrashIcon className="w-4 h-4" />Delete</DropdownMenuItem>
         </DropdownMenuContent>
@@ -63,7 +66,7 @@ export function FileCardActions({ file }: { file: Doc<"files"> }) {
 }
 
 
-export function FileCard({ file }: { file: Doc<"files"> & { url: string } }) {
+export function FileCard({ file, favourites }: { file: Doc<"files"> & { url: string }, favourites: Doc<"favourites">[] }) {
   const isImage = (file: Doc<"files">) => {
     switch (file.type) {
       case "image/webp":
@@ -84,12 +87,15 @@ export function FileCard({ file }: { file: Doc<"files"> & { url: string } }) {
     "application/pdf": <TextIcon />,
     "text/csv": <GanttChartIcon />
   } as Record<File['type'], ReactNode>
+
+  const isFavourited = favourites.some((favourite) => favourite.fileId === file._id)
+
   return (
     <Card>
       <CardHeader className="relative">
         <CardTitle className="flex gap-2">{typeIcons[file.type]} {file.name}</CardTitle>
         <div className="absolute top-4 right-2">
-          <FileCardActions file={file} />
+          <FileCardActions file={file} isFavourited={isFavourited} />
         </div>
       </CardHeader>
       <CardContent className="h-[200px] flex justify-center items-center">

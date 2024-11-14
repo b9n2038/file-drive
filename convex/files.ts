@@ -203,13 +203,7 @@ export const getAllFavourites = query({
       .withIndex('by_user_id_file_id_orgId', (q) => q.eq('userId', access.user._id).eq('orgId', args.orgId))
       .collect()
 
-    const filesWithUrl = await Promise.all(
-      files.map(async (file) => ({
-        ...file,
-        url: await ctx.storage.getUrl(file.fileId),
-      }))
-    );
-    return filesWithUrl;
+    return files;
   }
 })
 
