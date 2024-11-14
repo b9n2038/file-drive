@@ -63,7 +63,7 @@ export default function FileBrowser({ title, favouritesOnly }: { title: string, 
 
         <div className='grid grid-cols-4 gap-2'>
           {files?.map((file) => {
-            return <FileCard key={file._id} file={file} favourites={favourites} />
+            return <FileCard key={file._id} file={file} favourites={favourites ?? []} />
           })}
         </div>
       </div>

@@ -55,8 +55,8 @@ export function FileCardActions({ file, isFavourited }: { file: Doc<"files">, is
         <DropdownMenuTrigger><MoreVertical className="size-4" /></DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem onClick={() => toggleFavourite({ fileId: file._id })} className="flex gap-1  items-center cursor:pointer">
-            {isFavourited ? <StarFilledIcon className="w-4 h-4" /> :
-              <StarIcon className="w-4 h-4" />} Favourite</DropdownMenuItem>
+            {isFavourited ? (<><StarFilledIcon className="w-4 h-4" /> Unfavourite</>) :
+              (<><StarIcon className="w-4 h-4" /> Favourite</>)}</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setOpen(true)} className="flex gap-1 text-red-600 items-center cursor:pointer"><TrashIcon className="w-4 h-4" />Delete</DropdownMenuItem>
         </DropdownMenuContent>
