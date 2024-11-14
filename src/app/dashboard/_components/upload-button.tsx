@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { useOrganization, useSession, useUser } from '@clerk/nextjs'
 import { useMutation } from 'convex/react'
-import { api } from '../../convex/_generated/api'
+import { api } from '../../../../convex/_generated/api'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useToast } from "@/hooks/use-toast"
 import { z } from "zod"

@@ -1,21 +1,17 @@
 'use client'
 import { useOrganization, useSession, useUser } from '@clerk/nextjs'
-import { useMutation, useQuery } from 'convex/reacts
-import { api } from '../../convex/_generated/api'
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Loader2 } from "lucide-react"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 import { Button } from '@/components/ui/button'
 import { SearchIcon } from 'lucide-react'
 
@@ -63,6 +59,7 @@ export default function SearchBar({ query, setQuery }: { query: string, setQuery
             )}
           />
           <Button
+            size='sm'
             type='submit'
           >
             <SearchIcon>Search</SearchIcon>
