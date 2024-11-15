@@ -36,7 +36,7 @@ export default function FileBrowser({ title, favouritesOnly }: { title: string, 
     orgId = organization?.organization?.id ?? user.user?.id
   }
 
-  const favourites = useQuery(api.files.getAllFavourites, orgId ? { orgId, favourites: favouritesOnly } : 'skip')
+  const favourites = useQuery(api.files.getAllFavourites, orgId ? { orgId } : 'skip')
 
   const files = useQuery(api.files.getFiles, orgId ? { orgId, query, favourites: favouritesOnly } : 'skip')
 
