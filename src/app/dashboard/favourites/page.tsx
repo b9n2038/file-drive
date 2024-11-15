@@ -6,7 +6,7 @@ export default (
 ) => {
   return (
     <div className='w-full'>
-      <FileBrowser title="Your Favourites" favourites={true} />
+      <FileBrowser title="Your Favourites" favouritesOnly={true} />
     </div>
   )
 }

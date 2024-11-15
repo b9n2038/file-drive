@@ -6,7 +6,7 @@ export default function FilesPage() {
   return (
     <div className='w-full'>
       <h1 className='text-4xl font-bold'>Your Files</h1>
-      <FileBrowser />
+      <FileBrowser title="Your Files" />
     </div>
   )
 }
