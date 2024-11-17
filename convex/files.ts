@@ -6,7 +6,8 @@ import { Id } from './_generated/dataModel'
 
 async function hasAccessToOrg(ctx: QueryCtx | MutationCtx, tokenIdentifier: string, orgId: string) {
   const user = await getUser(ctx, tokenIdentifier)
-  const hasAccess = user.orgIds.includes(orgId) || user.tokenIdentifier.includes(orgId)
+  const hasAccess = user.orgIds.some(item => item.orgId === orgId) || user.tokenIdentifier.includes(orgId)
+
   console.log('hasAccess', hasAccess)
   console.log(user.orgIds)
   console.log(user.tokenIdentifier, tokenIdentifier)
@@ -63,22 +64,16 @@ export const deleteFile = mutation({
   args: { fileId: v.id("files") }
   , handler: async (ctx, args) => {
     console.log('deleteFile')
-    const identity = await ctx.auth.getUserIdentity()
-    console.log('identity', identity)
-    if (!identity) {
-      console.log('you must be logged in')
-      return []
-    }
-    const file = await ctx.db.get(args.fileId)
-
-    if (!file) {
-      throw new ConvexError('File does not exist')
-    }
-    const hasAccess = await hasAccessToOrg(ctx, identity.tokenIdentifier, file.orgId)
-    if (!hasAccess) {
+    const access = await hasAccessToFile(ctx, args.fileId)
+    if (!access) {
       throw new ConvexError('You do not have access to delete this file.')
     }
-    //    ctx.storage.delete(file?.fileId)
+
+    const isAdmin = access.user.orgIds.find(org => org.orgId === access.file.orgId)?.role === 'admin'
+    //ctx.storage.delete(file?.fileId)
+    if (!isAdmin) {
+      throw new ConvexError('you dont have admin access')
+    }
 
     await ctx.db.delete(args.fileId)
     return

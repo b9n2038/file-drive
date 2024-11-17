@@ -26,6 +26,7 @@ import { useMutation } from "convex/react"
 import { useToast } from "@/hooks/use-toast"
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu"
 import { StarFilledIcon } from "@radix-ui/react-icons"
+import { Protect } from "@clerk/nextjs"
 
 
 export function FileCardActions({ file, isFavourited }: { file: Doc<"files">, isFavourited: boolean }) {
@@ -57,8 +58,10 @@ export function FileCardActions({ file, isFavourited }: { file: Doc<"files">, is
           <DropdownMenuItem onClick={() => toggleFavourite({ fileId: file._id })} className="flex gap-1  items-center cursor:pointer">
             {isFavourited ? (<><StarFilledIcon className="w-4 h-4" /> Unfavourite</>) :
               (<><StarIcon className="w-4 h-4" /> Favourite</>)}</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setOpen(true)} className="flex gap-1 text-red-600 items-center cursor:pointer"><TrashIcon className="w-4 h-4" />Delete</DropdownMenuItem>
+          <Protect permission="org:role:admin">
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setOpen(true)} className="flex gap-1 text-red-600 items-center cursor:pointer"><TrashIcon className="w-4 h-4" />Delete</DropdownMenuItem>
+          </Protect>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
