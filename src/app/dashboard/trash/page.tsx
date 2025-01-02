@@ -1,10 +1,10 @@
 'use client'
 import FileBrowser from '../_components/file-browser'
 
-export default function FavouritesPage() {
+export default function TrashPage() {
   return (
     <div className="w-full">
-      <FileBrowser title="Your Favourites" favouritesOnly={true} />
+      <FileBrowser title="Your Trash" deletedOnly={true} />
     </div>
   )
 }
