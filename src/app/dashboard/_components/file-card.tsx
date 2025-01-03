@@ -1,9 +1,3 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import Image from 'next/image'
-import { api } from '../../../../convex/_generated/api'
-import { Doc } from '../../../../convex/_generated/dataModel'
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,14 +9,28 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/hooks/use-toast'
 import { Protect } from '@clerk/nextjs'
 import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu'
 import { StarFilledIcon } from '@radix-ui/react-icons'
 import { useMutation, useQuery } from 'convex/react'
-import { GanttChartIcon, ImageIcon, MoreVertical, StarIcon, TextIcon, TrashIcon, UndoIcon } from 'lucide-react'
+import { formatRelative, subDays } from 'date-fns'
+import {
+  FileIcon,
+  GanttChartIcon,
+  ImageIcon,
+  MoreVertical,
+  StarIcon,
+  TextIcon,
+  TrashIcon,
+  UndoIcon
+} from 'lucide-react'
+import Image from 'next/image'
 import { ReactNode, useState } from 'react'
+import { api } from '../../../../convex/_generated/api'
+import { Doc } from '../../../../convex/_generated/dataModel'
 
 export function FileCardActions({ file, isFavourited }: { file: Doc<'files'>; isFavourited: boolean }) {
   const deleteFile = useMutation(api.files.deleteFile)
@@ -62,6 +70,12 @@ export function FileCardActions({ file, isFavourited }: { file: Doc<'files'>; is
           <MoreVertical className="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => window.open(file.url, '_blank')}>
+            <>
+              <FileIcon />
+              Download
+            </>
+          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => toggleFavourite({ fileId: file._id })}
             className="flex gap-1  items-center cursor:pointer"
@@ -146,7 +160,7 @@ export function FileCard({
   return (
     <Card>
       <CardHeader className="relative">
-        <CardTitle className="flex gap-2">
+        <CardTitle className="flex gap-2 text-base font-normal">
           {typeIcons[file.type]} {file.name}
         </CardTitle>
         <div className="absolute top-4 right-2">
@@ -158,13 +172,17 @@ export function FileCard({
         {file.type == 'text/csv' && <GanttChartIcon className="w-20 h-20" />}
         {file.type == 'application/pdf' && <TextIcon className="w-20 h-20" />}
       </CardContent>
-      <CardFooter className="flex justify-center items-center">
-        <Avatar>
-          <AvatarImage src={userProfile?.image} />
-          <AvatarFallback>{userProfile?.name}</AvatarFallback>
-        </Avatar>
-        {userProfile?.name}
-        <Button onClick={() => window.open(file.url, '_blank')}>Download</Button>
+      <CardFooter className="flex justify-between items-center">
+        <div className="text-xs text-gray-700 w-40 items-center">
+          <Avatar className="w-6 h-6">
+            <AvatarImage src={userProfile?.image} />
+            <AvatarFallback>{userProfile?.name}</AvatarFallback>
+          </Avatar>
+          {userProfile?.name}
+        </div>
+        <div className="flex gap-2 text-xs text-gray-700">
+          Uploaded on {formatRelative(subDays(new Date(file._creationTime), 3), new Date())}
+        </div>
       </CardFooter>
     </Card>
   )
