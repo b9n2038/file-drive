@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { Label } from '@radix-ui/react-label'
 
 function Placeholder() {
   return (
@@ -87,9 +88,10 @@ export default function FileBrowser({
               Table
             </TabsTrigger>
           </TabsList>
-          <div>
+          <div className="flex gap-2 items-center">
+            <Label htmlFor="type-select">Type filter</Label>
             <Select value={type} onValueChange={setType}>
-              <SelectTrigger className="w-[180px]" defaultValue={'all'}>
+              <SelectTrigger id="type-select" className="w-[180px]" defaultValue={'all'}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

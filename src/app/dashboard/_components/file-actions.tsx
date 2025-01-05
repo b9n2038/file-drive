@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger
 } from '@radix-ui/react-dropdown-menu'
 import { StarFilledIcon } from '@radix-ui/react-icons'
-import { useMutation } from 'convex/react'
+import { useMutation, useQuery } from 'convex/react'
 import { FileIcon, MoreVertical, StarIcon, TrashIcon, UndoIcon } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '../../../../convex/_generated/api'
@@ -28,8 +28,10 @@ export function FileCardActions({ file, isFavourited }: { file: Doc<'files'>; is
   const restoreFile = useMutation(api.files.restoreFile)
   const toggleFavourite = useMutation(api.files.toggleFavourite)
   //  const userProfile = useQuery(api.users.getUserProfile)
+  const me = useQuery(api.users.getMe)
   const { toast } = useToast()
   const [isOpen, setOpen] = useState(false)
+
   return (
     <>
       <AlertDialog open={isOpen} onOpenChange={setOpen}>
@@ -81,7 +83,15 @@ export function FileCardActions({ file, isFavourited }: { file: Doc<'files'>; is
               </>
             )}
           </DropdownMenuItem>
-          <Protect role="org:admin">
+          <Protect
+            condition={(check) => {
+              return (
+                check({
+                  role: 'org:admin'
+                }) || file.userId === me?._id
+              )
+            }}
+          >
             <DropdownMenuSeparator />
             {!file.shouldDelete ? (
               <DropdownMenuItem
