@@ -2,7 +2,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useOrganization, useSession, useUser } from '@clerk/nextjs'
 import { useQuery } from 'convex/react'
-import { Loader2 } from 'lucide-react'
+import { GridIcon, Loader2, TableIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import { api } from '../../../../convex/_generated/api'
@@ -63,12 +63,28 @@ export default function FileBrowser({
         <UploadButton />
       </div>
 
-      <Tabs defaultValue="grid" className="w-[400px]">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="grid">Grid</TabsTrigger>
-          <TabsTrigger value="table">Table</TabsTrigger>
+      <Tabs defaultValue="grid" className="">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="grid">
+            <GridIcon />
+            Grid
+          </TabsTrigger>
+          <TabsTrigger value="table">
+            <TableIcon />
+            Table
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="grid">
+          <div>
+            {isLoading && (
+              <div className="flex flex-col gap-8 w-full items-center mt-24">
+                <Loader2 className="h-32 w-32 animate-spin text-gray-500" />
+                <div className="text-2xl">Loading your images...</div>
+              </div>
+            )}
+
+            {!isLoading && query.length === 0 && files?.length === 0 && <Placeholder />}
+          </div>
           <div className="grid grid-cols-4 gap-2">
             {modifiedFiles?.map((file) => {
               return (
@@ -81,17 +97,6 @@ export default function FileBrowser({
           <DataTable columns={columns} data={modifiedFiles} />
         </TabsContent>
       </Tabs>
-
-      <div>
-        {isLoading && (
-          <div className="flex flex-col gap-8 w-full items-center mt-24">
-            <Loader2 className="h-32 w-32 animate-spin text-gray-500" />
-            <div className="text-2xl">Loading your images...</div>
-          </div>
-        )}
-
-        {!isLoading && query.length === 0 && files?.length === 0 && <Placeholder />}
-      </div>
     </div>
   )
 }
