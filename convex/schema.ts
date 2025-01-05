@@ -1,6 +1,12 @@
 import { defineSchema, defineTable } from 'convex/server'
 import { v } from 'convex/values'
 
+// export const fileTypeGroups = {
+//   pdf: [v.literal('application/pdf')],
+//   image: [v.literal('image/png'), v.literal('image/jpg'), v.literal('image/webp'), v.literal('image/jpeg')],
+//   csv: [v.literal('text/csv')]
+// }
+//
 export const fileTypes = v.union(
   v.literal('image/png'),
   v.literal('image/jpg'),

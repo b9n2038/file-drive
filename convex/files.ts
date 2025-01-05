@@ -3,6 +3,12 @@ import { Id } from './_generated/dataModel'
 import { internalMutation, mutation, MutationCtx, query, QueryCtx } from './_generated/server'
 import { fileTypes } from './schema'
 
+export const fileTypeGroups = {
+  pdf: ['application/pdf'],
+  image: ['image/png', 'image/jpg', 'image/webp', 'image/jpeg'],
+  csv: ['text/csv']
+}
+
 async function hasAccessToOrg(ctx: QueryCtx | MutationCtx, orgId: string) {
   const identity = await ctx.auth.getUserIdentity()
 
@@ -107,7 +113,8 @@ export const getFiles = query({
     orgId: v.string(),
     query: v.optional(v.string()),
     favourites: v.optional(v.boolean()),
-    deleted: v.optional(v.boolean())
+    deleted: v.optional(v.boolean()),
+    type: v.optional(v.union(v.literal('image'), v.literal('pdf'), v.literal('csv'), v.literal('all')))
   },
   handler: async (ctx, args) => {
     console.log('args', args)
@@ -143,6 +150,12 @@ export const getFiles = query({
       !query || query.length === 0 ? files : files.filter((f) => f.name.toLowerCase().includes(query.toLowerCase()))
     console.log('filtered', files.length)
 
+    if (args.type) {
+      console.log('type', args.type)
+      const filterTypes = args.type === 'all' ? [] : fileTypeGroups[args.type]
+      files = args.type === 'all' ? files : files.filter((f) => filterTypes.includes(f.type))
+      console.log('filtered', files.length)
+    }
     const filesWithUrl = await Promise.all(
       files.map(async (file) => ({
         ...file,

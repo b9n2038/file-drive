@@ -12,6 +12,16 @@ import { DataTable } from './file-table'
 import SearchBar from './search-bar'
 import UploadButton from './upload-button'
 
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+
 function Placeholder() {
   return (
     <div className="flex flex-col mt-24 gap-8 mx-auto w-full items-center">
@@ -35,6 +45,7 @@ export default function FileBrowser({
   console.log(session)
   const organization = useOrganization()
   const [query, setQuery] = useState('')
+  const [type, setType] = useState('all')
   const user = useUser()
 
   let orgId: string | undefined = undefined
@@ -46,7 +57,7 @@ export default function FileBrowser({
 
   const files = useQuery(
     api.files.getFiles,
-    orgId ? { orgId, query, favourites: favouritesOnly, deleted: deletedOnly } : 'skip'
+    orgId ? { orgId, query, favourites: favouritesOnly, deleted: deletedOnly, type } : 'skip'
   )
 
   const isLoading = files === undefined
@@ -60,20 +71,39 @@ export default function FileBrowser({
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold">{title}</h1>
         <SearchBar query={query} setQuery={setQuery} />
+
         <UploadButton />
       </div>
 
       <Tabs defaultValue="grid" className="">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
-          <TabsTrigger value="grid">
-            <GridIcon />
-            Grid
-          </TabsTrigger>
-          <TabsTrigger value="table">
-            <TableIcon />
-            Table
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex justify-between items-center">
+          <TabsList className="grid grid-cols-2 mb-4">
+            <TabsTrigger value="grid">
+              <GridIcon />
+              Grid
+            </TabsTrigger>
+            <TabsTrigger value="table">
+              <TableIcon />
+              Table
+            </TabsTrigger>
+          </TabsList>
+          <div>
+            <Select value={type} onValueChange={setType}>
+              <SelectTrigger className="w-[180px]" defaultValue={'all'}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Type</SelectLabel>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="image">Image</SelectItem>
+                  <SelectItem value="csv">CSV</SelectItem>
+                  <SelectItem value="pdf">PDF</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <TabsContent value="grid">
           <div>
             {isLoading && (
